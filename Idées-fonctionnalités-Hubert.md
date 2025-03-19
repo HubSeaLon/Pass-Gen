@@ -29,7 +29,11 @@ Choix de :
 - API pour voir si un mot de passe apparait dans une fuite de données : Have I been pwned ?
 Ou si on veut pas payer, on redirige l'utilisateur avec un lien sur la page.
 
-- Indicateur de sécurité pour le mot de passe généré
+- Utilisation d'un dictionnaire de mot de passe (rockyou...), peut être dévlopper une petite API pour éviter de stocker les mdp en local? (+)
+
+- Indicateur de sécurité pour le mot de passe généré 
+
+- Verifier la rétuilisation de mot de passes déjà enregistrés (+)
 
 **Plus complexe** :
 - Rajouter le choix du nombre minimum du caractères ou le nombre exact pour lettre majuscule/minuscule, chiffre et symboles.
@@ -44,12 +48,20 @@ Ou si on veut pas payer, on redirige l'utilisateur avec un lien sur la page.
 - Pour accéder au gestionnaire il faudra utiliser la biométrie ou un mdp fort
 - Pour l'instant, stocker en local les mdp
 - Chiffrer le stockage des mdp
-- Utiliser la biométrie ou un mdp pour afficher en clair
-- Indicateur de sécurité pour un mot de passe stocké et entré dans le gestionnaire
+- Utiliser la biométrie ou un mdp pour afficher en clair 
+- Indicateur de sécurité pour un mot de passe stocké et entré dans le gestionnaire (+)
+- Date de création du mot de passe / Ajout de recommendation de changement de mots de passe si la date est trop vieille (+)
 
-**Pous complexe**
+
+**Pous complexe / extensions**
 - Remplissage automatique des mots de passe sur sites web et applications
+- Partage de mots de passes (qr codes, opt..) (+)
+- Visualisation du hash du mot de passe (MD5, SHA-1, SHA-256,) (+)
+- Faire une simulation du temps nécessaire pour casser le mdp (https://nothing2hide.org/fr/verifier-la-robustesse-de-votre-mot-de-passe/) (+)
+- Estimation du coût en ressources pour casser un mot de passe (100$ le GPU : 8h nécessaire) (+)
+- Mode furtif (cacher les mots de passes, assombrir l'ecran, le noircir quand on change d'application) (+)
 
+  
 ## Notes 
 
 Pour le temps qu'on a je trouve que juste garder la partie générateur de mot de passe me parait très bien. On a déjà plusieurs fonctionnalités dans cette partie. 
