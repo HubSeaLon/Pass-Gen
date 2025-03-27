@@ -10,6 +10,60 @@ import UIKit
 class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
     
     
+    // Phonétique
+    
+    @IBOutlet weak var textPhonetique: UITextField!
+    
+    let charMap: [Character: [String]] = [
+        "a": ["a", "à", "â", "ä", "A", "À", "Â", "Ä", "4", "@"],
+        "b": ["b", "B", "8", "ß"],
+        "c": ["c", "ç", "C", "Ç", "<", "("],
+        "d": ["d", "D"],
+        "e": ["e", "é", "è", "ê", "ë", "E", "É", "È", "Ê", "Ë", "3"],
+        "f": ["f", "F", "ph", "PH"],
+        "g": ["g", "G", "9", "6"],
+        "h": ["h", "H", "#"],
+        "i": ["i", "î", "ï", "I", "Î", "Ï", "1", "!", "|"],
+        "j": ["j", "J"],
+        "k": ["k", "K", "c", "C", "q", "Q"],
+        "l": ["l", "L", "1", "|", "!", "£"],
+        "m": ["m", "M"],
+        "n": ["n", "N", "ñ", "Ñ"],
+        "o": ["o", "ô", "ö", "O", "Ô", "Ö", "0"],
+        "p": ["p", "P", "¶"],
+        "q": ["q", "Q", "9"],
+        "r": ["r", "R", "®"],
+        "s": ["s", "S", "$", "5"],
+        "t": ["t", "T", "7", "+"],
+        "u": ["u", "ù", "û", "ü", "U", "Ù", "Û", "Ü"],
+        "v": ["v", "V", "\\/"],
+        "w": ["w", "W", "\\/\\/", "vv", "VV"],
+        "x": ["x", "X", "%", "×"],
+        "y": ["y", "Y", "¥"],
+        "z": ["z", "Z", "2"],
+        " ": ["_", "-"]
+    ]
+    
+    
+    @IBAction func generateurPhonetique(_ sender: UITextField) {
+        var resultat = ""
+        
+        for char in sender.text ?? "" {
+            if let lettre = charMap[char] {
+                resultat += lettre.randomElement() ?? "?"
+            } else {
+                resultat += String(char)
+            }
+        }
+        
+        textMotdepasse.text = resultat
+    }
+    
+    
+    
+    // A faire avec toutes les lettre de l'alphabet ??
+    
+    
     // Données et initialisation des PickerView
     @IBOutlet weak var pickerLongueur: UIPickerView!
     @IBOutlet weak var pickerSeparateur: UIPickerView!
@@ -28,17 +82,18 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
     let minuscules: [Character] = Array("abcdefghijklmnopqrstuvwxyz")
     let chiffres = Array("0123456789")
     let symboles = Array("!@#$%*()-_=+[]{};:,./?")
-    var motdepasse: String = ""
-    var complexiteMotdepasse: Double = 0.0
+    
+    var complexiteMotdepasse: Float = 0.0
     
     
     // Switchs
     @IBOutlet weak var switchSeparateur: UISwitch!
     @IBOutlet weak var switchPhonetique: UISwitch!
     
-    
-    @IBOutlet var switchMdp: [UISwitch]!
- 
+    @IBOutlet weak var switchMajuscule: UISwitch!
+    @IBOutlet weak var switchMinuscule: UISwitch!
+    @IBOutlet weak var switchChiffre: UISwitch!
+    @IBOutlet weak var switchSymbole: UISwitch!
     
     // Boutons
     
@@ -51,27 +106,27 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
     @IBOutlet weak var sousVue1: UIView!
     @IBOutlet weak var sousVue2: UIView!
     
-    @IBOutlet weak var barMdpVue: UIView! // Changer la couleur selon la robustesse du mdp
-    
+ 
     
     // Complexité du mdp en nombre
     @IBOutlet weak var complexiteMdp: UILabel!
     
-    @IBOutlet weak var mdpVue: UIView!
+    
+    @IBOutlet weak var barComplexite: UIProgressView!
+    
+    
+    @IBOutlet weak var motComplexite: UILabel!
     
     @IBOutlet weak var textMotdepasse: UITextView!
     
-    @IBAction func onChangeSwitch(_ sender: UISwitch) {
-        for sw in switchMdp {
-            print("Switch \(sw.tag) : \(sw.isOn ? "ON" : "OFF")")
-        }
-
-        genererMotDePasse()
-    }
     
-
-
-        
+    
+    func initialisationVueMdp() {
+        complexiteMdp.text = "0 bits"
+        barComplexite.progress = 0.0
+        motComplexite.text = "Néant"
+        textMotdepasse.text = ""
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -80,33 +135,28 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
         pickerSeparateur.isHidden = true
         pickerEspacement.isHidden = true
         
-        
-        
         // PickerView
         // Assigner les pickerView au delegate et dataSource
 
-        pickerLongueur.delegate = self
-        pickerLongueur.dataSource = self
+        let pickers: [UIPickerView] = [pickerLongueur, pickerSeparateur, pickerEspacement]
         
-        pickerSeparateur.delegate = self
-        pickerSeparateur.dataSource = self
-        
-        pickerEspacement.delegate = self
-        pickerEspacement.dataSource = self
+        for picker in pickers {
+            picker.delegate = self
+            picker.dataSource = self
+        }
         
         
         // Switch
         // Etat actuel
         switchSeparateur.isOn = false
         updateUISwitchSeparateur(isSwitchOn: false)
-        switchSeparateur.addTarget(self, action: #selector(switchChanged(_:)), for: .valueChanged)
-        
+
         switchPhonetique.isOn = false
         updateUISwitchPhonetique(isSwitchOn: false)
-        switchPhonetique.addTarget(self, action: #selector(switchChanged(_:)), for: .valueChanged)
-        
-        
+
+        initialisationVueMdp()
     }
+    
     
     override func viewDidLayoutSubviews() { // Aryaa SK Coding - YouTube
         sousVue1.layer.cornerRadius = 10
@@ -114,13 +164,69 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
         
         sousVue2.layer.cornerRadius = 10
         sousVue2.translatesAutoresizingMaskIntoConstraints = true
+        
+        textMotdepasse.layer.borderWidth = 1.0
+        textMotdepasse.layer.borderColor = UIColor.gray.cgColor
+        textMotdepasse.layer.cornerRadius = 10
+        
     }
     
     
     
     
-
+    // Switch
+    // Fonction appelée quand l'utilisateur change l'état du switch
+    
+    @IBAction func switchChanged(_ sender: UISwitch) {
+        switch sender {
+            case switchSeparateur:
+                updateUISwitchSeparateur(isSwitchOn: sender.isOn)
+                
+            case switchPhonetique:
+                updateUISwitchPhonetique(isSwitchOn: sender.isOn)
+                
+                if sender.isOn {
+                    initialisationVueMdp()
+                } else {
+                    genererMotDePasse()
+                }
+            
+            default:
+                genererMotDePasse()
+        }
+    }
+    
+    
+    // MAJ des éléments si le switchSeparateur est activé
+    func updateUISwitchSeparateur(isSwitchOn: Bool){
+    
+        pickerEspacement.isHidden = !isSwitchOn
+        pickerSeparateur.isHidden = !isSwitchOn
+        if isSwitchOn {
+            pickerEspacement.reloadAllComponents()
+            print("Séparateur choisi : \(separateurSelectionnee)")
+            print("nombre espacement choisi : \(espacementSelectionnee)")
+        }
+        genererMotDePasse()
+    }
+    
+    
+    
+    // Change le visuel quand le phonétique est activé
+    func updateUISwitchPhonetique(isSwitchOn: Bool) {
+        // Change l'opacité pour montrer la désactivation
+        sousVue1.alpha = isSwitchOn ? 0.5 : 1.0
+        sousVue2.alpha = isSwitchOn ? 0.5 : 1.0
+        // Désactive l'interaction si activé
+        sousVue1.isUserInteractionEnabled = !isSwitchOn
+        sousVue2.isUserInteractionEnabled = !isSwitchOn
+        
+        textPhonetique.isEnabled = isSwitchOn ? true : false
+    }
+    
+    
     // Picker View
+    
     // Nombre de colonnes
     func numberOfComponents(in pickerLongueur: UIPickerView) -> Int {
         return 1 // 1 seule colonne par picker
@@ -142,6 +248,7 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
         return 0
     }
     
+    
     // Affichage des valeurs dans picker
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         if pickerView == pickerLongueur {
@@ -149,7 +256,7 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
         } else if pickerView == pickerSeparateur {
             return String(typeSeparateur[row])
         } else if pickerView == pickerEspacement {
-            // print("🔍 Affichage pickerEspacement : \(nombreEspacement[row])")
+            // print("Affichage pickerEspacement : \(nombreEspacement[row])")
             return "\(nombreEspacement[row])"
         }
         return nil
@@ -200,54 +307,7 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
     }
     
     
-    
-    
-    // Switch
-    
-    
-    // Fonction appelée quand l'utilisateur change l'état du switch
-    
-    @objc func switchChanged(_ sender: UISwitch) {
-        switch sender {
-            case switchSeparateur:
-                updateUISwitchSeparateur(isSwitchOn: sender.isOn)
-                
-            case switchPhonetique:
-                updateUISwitchPhonetique(isSwitchOn: sender.isOn)
 
-            
-            default:
-                break
-            }
-        genererMotDePasse()
-        
-    }
-    
-    
-    // MAJ des éléments si le switchSeparateur est activé
-    func updateUISwitchSeparateur(isSwitchOn: Bool){
-    
-        pickerEspacement.isHidden = !isSwitchOn
-        pickerSeparateur.isHidden = !isSwitchOn
-        if isSwitchOn {
-            pickerEspacement.reloadAllComponents()
-            print("Séparateur choisi : \(separateurSelectionnee)")
-            print("nombre espacement choisi : \(espacementSelectionnee)")
-        }
-        
-    }
-    
-    // Change l'opacité quand le phonétique est activé
-    func updateUISwitchPhonetique(isSwitchOn: Bool) {
-        sousVue1.alpha = isSwitchOn ? 0.5 : 1.0 // Change l'opacité pour montrer la désactivation
-        sousVue2.alpha = isSwitchOn ? 0.5 : 1.0
-        sousVue1.isUserInteractionEnabled = !isSwitchOn // Désactive l'interaction si activé
-        sousVue2.isUserInteractionEnabled = !isSwitchOn
-    }
-
-    
-    
-    
     
     
     // Générateur mot de passe
@@ -255,17 +315,20 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
     func genererMotDePasse() {
         var base = 0
         var caracteres = [Character]() // Initialisation
-
-        if switchMdp[2].isOn {
+        
+        if switchSymbole.isOn {
             caracteres += symboles
-            base += 22 }
-        if switchMdp[3].isOn {
+            base += 22
+        }
+        if switchMajuscule.isOn {
             caracteres += majuscules
-            base += 26}
-        if switchMdp[1].isOn {
+            base += 26
+        }
+        if switchChiffre.isOn {
             caracteres += chiffres
-            base += 10}
-        if switchMdp[0].isOn {
+            base += 10
+        }
+        if switchMinuscule.isOn {
             caracteres += minuscules
             base += 26
         }
@@ -273,6 +336,11 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
         // Vérifier si au moins une catégorie est sélectionnée
         guard !caracteres.isEmpty else {
             textMotdepasse.text = "Sélectionnez au moins une option !"
+            
+            complexiteMdp.text = "0 bits"
+            motComplexite.text = "Néant"
+            motComplexite.textColor = UIColor.black
+            barComplexite.progress = 0.0
             return
         }
 
@@ -324,6 +392,7 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
         var E: Double = 0.0
         var arrondiE: Double = 0.0
         
+        
         if switchSeparateur.isOn {
             var coefBinomial: Double = 1.0
             
@@ -333,14 +402,46 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
             }
             
             E = Double(longueur) * log2(Double(base)) + log2(Double(k)) + log2(coefBinomial)
-            
-            arrondiE = round(100*E)/100
-            complexiteMdp.text = String(arrondiE) + " bits"
-            
         } else {
             E = Double(longueur) * log2(Double(base))
-            arrondiE = round(100*E)/100
-            complexiteMdp.text = String(arrondiE) + " bits"
+        }
+        
+        arrondiE = round(10*E)/10
+        complexiteMdp.text = String(arrondiE) + " bits"
+        
+    
+        switch Int(arrondiE) {
+        case (0...27):
+            motComplexite.textColor = UIColor(ciColor: CIColor(red: 220/225, green: 20/255, blue: 60/255, alpha: 1))
+            motComplexite.text = "Très faible"
+        case (28...35):
+            motComplexite.textColor = UIColor(ciColor: CIColor(red: 255/255, green: 140/255, blue: 0/255, alpha: 1))
+            motComplexite.text = "Faible"
+        case (36...59):
+            motComplexite.textColor = UIColor(ciColor: CIColor(red: 255/255, green: 215/255, blue: 0/255, alpha: 1))
+            motComplexite.text = "Moyen"
+        case (60...128):
+            
+            motComplexite.text = "Fort"
+            motComplexite.textColor = UIColor(ciColor: CIColor(red: 50/255, green: 205/255, blue: 50/255, alpha: 1))
+        case (127...):
+            motComplexite.textColor = UIColor(ciColor: CIColor(red: 0/255, green: 128/255, blue: 0/255, alpha: 1))
+            motComplexite.text = "Très fort"
+        default:
+            motComplexite.text = "Erreur"
+        }
+        
+        
+        // Bar complexité
+        
+        let i: Int = Int(arrondiE)
+        let max: Int = 128
+        
+        if i <= max {
+            let ratio = Float(i) / Float(max)
+            barComplexite.progress = ratio
+        } else {
+            barComplexite.progress = 1.0
         }
     }
     

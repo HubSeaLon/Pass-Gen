@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		81C302382D95ADB700860A62 /* seclist.txt in Resources */ = {isa = PBXBuildFile; fileRef = 81C302372D95ADB700860A62 /* seclist.txt */; };
 		E409422B2D959C2000F3C50F /* CalculateurViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E409422A2D959C2000F3C50F /* CalculateurViewController.swift */; };
-		E480F61D2D9473CB00F0E430 /* seclist.txt in Resources */ = {isa = PBXBuildFile; fileRef = E480F61C2D9473CB00F0E430 /* seclist.txt */; };
 		E4C6A07A2D8AE94500371A6B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C6A0792D8AE94500371A6B /* AppDelegate.swift */; };
 		E4C6A07C2D8AE94500371A6B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C6A07B2D8AE94500371A6B /* SceneDelegate.swift */; };
 		E4C6A07E2D8AE94500371A6B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C6A07D2D8AE94500371A6B /* ViewController.swift */; };
@@ -39,8 +39,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		81C302372D95ADB700860A62 /* seclist.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = seclist.txt; sourceTree = "<group>"; };
 		E409422A2D959C2000F3C50F /* CalculateurViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalculateurViewController.swift; sourceTree = "<group>"; };
-		E480F61C2D9473CB00F0E430 /* seclist.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = seclist.txt; sourceTree = "<group>"; };
 		E4C6A0762D8AE94500371A6B /* PASSWD.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PASSWD.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4C6A0792D8AE94500371A6B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E4C6A07B2D8AE94500371A6B /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -113,8 +113,8 @@
 				E4C6A0822D8AE94600371A6B /* Assets.xcassets */,
 				E4C6A0842D8AE94600371A6B /* LaunchScreen.storyboard */,
 				E4C6A0872D8AE94600371A6B /* Info.plist */,
-				E480F61C2D9473CB00F0E430 /* seclist.txt */,
 				E409422A2D959C2000F3C50F /* CalculateurViewController.swift */,
+				81C302372D95ADB700860A62 /* seclist.txt */,
 			);
 			path = PASSWD;
 			sourceTree = "<group>";
@@ -240,7 +240,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E480F61D2D9473CB00F0E430 /* seclist.txt in Resources */,
+				81C302382D95ADB700860A62 /* seclist.txt in Resources */,
 				E4C6A0832D8AE94600371A6B /* Assets.xcassets in Resources */,
 				E4C6A0862D8AE94600371A6B /* Base in Resources */,
 				E4C6A0812D8AE94500371A6B /* Base in Resources */,

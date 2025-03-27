@@ -231,7 +231,7 @@ class CalculateurViewController: UIViewController {
     }
     
     var mdp: String = ""
-    
+    var charge: Bool = false
     
     @IBAction func affichageDynamique(_ sender: UITextField) {
 
@@ -288,12 +288,15 @@ class CalculateurViewController: UIViewController {
             msg.text = messages_impossibles[Int.random(in: 0...2)]
         }
         
-        if contenu.contains(mdp){
-            dictionnaire.text = "Oui ⚠️"
-            dictionnaire.textColor = UIColor.red
-        }else{
-            dictionnaire.text = "Non"
-            dictionnaire.textColor = UIColor.green
+        if !charge {dictionnaire.text = "Chargement..."}
+        else{
+            if wordlists.contains(mdp){
+                dictionnaire.text = "Oui ⚠️"
+                dictionnaire.textColor = UIColor.red
+            }else{
+                dictionnaire.text = "Non"
+                dictionnaire.textColor = UIColor.green
+            }
         }
         
     }
@@ -314,30 +317,39 @@ class CalculateurViewController: UIViewController {
     }
     
     var contenu :String = ""
+    var wordlists: Set <String> = []
     
     override func viewDidLoad() {
-
         super.viewDidLoad()
-        affichageDynamique(mdpInput) // On lance la vue avec un champ vide pour initialiser les labels et la barre de score
         
+        affichageDynamique(mdpInput) // Initialiser les labels avec champ vide
+
+        // Méthode asynchrome trouvée grâce à GPT
         
-        
-        // Cherche l'URL du fichier dans le bundle de l'application
-        if let fileURL = Bundle.main.url(forResource: "seclist", withExtension: "txt") {
-            // Lire le contenu du fichier
-            do {
-                contenu = try String(contentsOf: fileURL, encoding: .isoLatin1)
-            } catch {
-                print("Erreur lors de la lecture du fichier : \(error.localizedDescription)")
+        // Chargement asynchrone du fichier wordlist
+        DispatchQueue.global(qos: .userInitiated).async {
+            if let fileURL = Bundle.main.url(forResource: "seclist", withExtension: "txt") {
+                do {
+                    let contenu = try String(contentsOf: fileURL, encoding: .isoLatin1)
+                    let loadedWordlist = Set(contenu.components(separatedBy: .newlines))
+
+                    // Mise à jour sur le thread principal
+                    DispatchQueue.main.async {
+                        self.wordlists = loadedWordlist
+                        self.charge = true
+                        print("Wordlist chargée : \(self.wordlists.count) mots.")
+                        self.affichageDynamique(self.mdpInput)
+                  
+                    }
+                } catch {
+                    print("Erreur de lecture du fichier : \(error.localizedDescription)")
+                }
+            } else {
+                print("Le fichier seclist.txt est introuvable dans le bundle.")
             }
-        } else {
-            print("Le fichier n'a pas été trouvé dans le bundle.")
         }
-        
-    
-        // Do any additional setup after loading the view.
     }
-    
+
 
     /*
     // MARK: - Navigation
