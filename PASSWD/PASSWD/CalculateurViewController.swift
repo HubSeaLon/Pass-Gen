@@ -11,7 +11,7 @@ import Foundation
 import CryptoKit
 
 
-class CalculateurViewController: UIViewController {
+class CalculateurViewController: UIViewController, UITextFieldDelegate {
     
     //let wordlist = Bundle.main.path(forResource: "rockyou", ofType: "txt")
 
@@ -103,8 +103,9 @@ class CalculateurViewController: UIViewController {
         var min: Bool = false
         var nb: Bool = false
         var sym: Bool = false
+        var autres: Bool = false
         
-        var tabInput: [Character] = Array(mdp)
+        let tabInput: [Character] = Array(mdp)
         
         // Analyser le contenu du mot de passe
         if mdp == "" {
@@ -112,42 +113,33 @@ class CalculateurViewController: UIViewController {
         }
         
         for char in tabInput {
-            if let asciiValue = char.asciiValue, asciiValue >= 65 && asciiValue <= 90 { // le mdp contient t-il des majsucules ?
-                maj = true
-            }
-            
-            if let asciiValue = char.asciiValue, asciiValue >= 97 && asciiValue <= 122 { // le mdp contient t-il des minuscules ?
-                min = true
-            }
-            
-            if let asciiValue = char.asciiValue, asciiValue >= 48 && asciiValue <= 57 { // le mdp contient t-il des chiffres ?
-                nb = true
-            }
-            
-            if let asciiValue = char.asciiValue, asciiValue >= 33 && asciiValue <= 47 { // le mdp contient t-il des symboles ?
-                sym = true
-            }
-            
-            // Calcul de la base en fonction de ce que contient le mot de
+            if let ascii = char.asciiValue {
+                if !maj && ascii >= 65 && ascii <= 90 {
+                    maj = true
+                } else if !min && ascii >= 97 && ascii <= 122 {
+                    min = true
+                } else if !nb && ascii >= 48 && ascii <= 57 {
+                    nb = true
+                } else if !sym && (
+                    (ascii >= 33 && ascii <= 47) ||
+                    (ascii >= 58 && ascii <= 64) ||
+                    (ascii >= 91 && ascii <= 96) ||
+                    (ascii >= 123 && ascii <= 126)
+                ) {
+                    sym = true
+                }
+            } else { autres = true}
         }
         
-        if maj {
-            base += 26
-        }
+        if maj { base += 26 }
+        if min { base += 26 }
+        if nb { base += 10 }
+        if sym { base += 33 }
+        if autres { base += 150 } // Valeur arbitrre car il y aurait + 100 000 caractères non ASCII
         
-        if min {
-            base += 26
-        }
         
-        if nb {
-            base += 10
-        }
         
-        if sym {
-            base += 22
-        }
-        
-        var longueur =  mdp.count
+        let longueur =  mdp.count
 
         var E: Double = 0.0
         var arrondiE: Double = 0.0
@@ -165,9 +157,6 @@ class CalculateurViewController: UIViewController {
         
         var echelle: String
         
-        var E: Double = 0.0
-        var arrondiE: Double = 0.0
-        
         var temps: Double
         var bits: Double
         
@@ -180,7 +169,7 @@ class CalculateurViewController: UIViewController {
         
 
         
-        var sDansAnnees = 60*60*24*365
+        let sDansAnnees = 60*60*24*365
         
         switch temps {
         case ..<60:
@@ -249,7 +238,7 @@ class CalculateurViewController: UIViewController {
         mdpHash2.text = SHA1(string: mdp)
         
         // Calcul du temps necessaire pour cracker
-        var result = tempsCrack(string: mdp)
+        let result = tempsCrack(string: mdp)
         temps.text = result.0 + result.1
         
          // Calcul de la robustesse (bits)
@@ -319,8 +308,19 @@ class CalculateurViewController: UIViewController {
     var contenu :String = ""
     var wordlists: Set <String> = []
     
+    
+    @objc func cacherClavier() {
+        view.endEditing(true)
+    }
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        
+        mdpInput.delegate = self
+        let tap = UITapGestureRecognizer(target: self, action: #selector(cacherClavier))
+        view.addGestureRecognizer(tap)
         
         affichageDynamique(mdpInput) // Initialiser les labels avec champ vide
 

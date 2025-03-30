@@ -7,14 +7,15 @@
 
 import UIKit
 
-class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
+// UITextFieldDelegate pour pouvoir enlever le clavier
+class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate {
     
     
     // Phonétique
     
     @IBOutlet weak var textPhonetique: UITextField!
     
-    let charMap: [Character: [String]] = [
+    let charPhonetique: [Character: [String]] = [
         "a": ["a", "à", "â", "ä", "A", "À", "Â", "Ä", "4", "@"],
         "b": ["b", "B", "8", "ß"],
         "c": ["c", "ç", "C", "Ç", "<", "("],
@@ -46,30 +47,57 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
     
     
     @IBAction func generateurPhonetique(_ sender: UITextField) {
+        
+        // Génération MDP
         var resultat = ""
         
-        for char in sender.text ?? "" {
-            if let lettre = charMap[char] {
-                resultat += lettre.randomElement() ?? "?"
+        let texte = sender.text?.lowercased() ?? ""
+    
+        for char in texte {
+            if let lettre = charPhonetique[char] {
+                resultat += lettre.randomElement().map { String($0) } ?? "?"
             } else {
                 resultat += String(char)
             }
         }
+        textMotdepasse.text = resultat
         
+        
+        // Complexite
+        if textMotdepasse.text == "" {
+            initialisationVueMdp()
+            return
+        }
+        
+        complexiteMdp(resultat)
+    }
+    
+ 
+    func refreshPhonetique() {
+        let texte = textPhonetique.text?.lowercased() ?? ""
+        
+        var resultat = ""
+        
+        for char in texte {
+            if let lettre = charPhonetique[char] {
+                resultat += lettre.randomElement().map { String($0) } ?? "?"
+            } else {
+                resultat += String(char)
+            }
+        }
         textMotdepasse.text = resultat
     }
     
     
     
-    // A faire avec toutes les lettre de l'alphabet ??
-    
+    // Générateur MDP
     
     // Données et initialisation des PickerView
     @IBOutlet weak var pickerLongueur: UIPickerView!
     @IBOutlet weak var pickerSeparateur: UIPickerView!
     @IBOutlet weak var pickerEspacement: UIPickerView!
     
-    let nombreLongueur = Array(1...128)
+    let nombreLongueur = Array(1...256)
     let typeSeparateur: [Character] = Array("-|!?/*")
 
     var longueurSelectionnee: Int = 1
@@ -81,10 +109,7 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
     let majuscules: [Character] = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
     let minuscules: [Character] = Array("abcdefghijklmnopqrstuvwxyz")
     let chiffres = Array("0123456789")
-    let symboles = Array("!@#$%*()-_=+[]{};:,./?")
-    
-    var complexiteMotdepasse: Float = 0.0
-    
+    let symboles = Array("!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~") // 33 symboles ASCII
     
     // Switchs
     @IBOutlet weak var switchSeparateur: UISwitch!
@@ -96,15 +121,20 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
     @IBOutlet weak var switchSymbole: UISwitch!
     
     // Boutons
-    
     @IBAction func refresh(_ sender: Any) {
-        genererMotDePasse()
+        if switchPhonetique.isOn {
+            refreshPhonetique()
+        } else {
+            genererMotDePasse()
+        }
+        
     }
     
     
     // UI
     @IBOutlet weak var sousVue1: UIView!
     @IBOutlet weak var sousVue2: UIView!
+    @IBOutlet weak var sousVue3: UIView!
     
  
     
@@ -128,9 +158,28 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
         textMotdepasse.text = ""
     }
     
+    
+    // return pour retirer le clavier (GPT)
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder() // ⬅️ Ferme le clavier
+        return true
+    }
+    
+    // Taper en dehors pour retirer le clavier (GPT)
+    @objc func cacherClavier() {
+        view.endEditing(true)
+    }
+
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Pouvoir retirer le clavier (GPT)
+        textPhonetique.delegate = self
+        let tap = UITapGestureRecognizer(target: self, action: #selector(cacherClavier))
+        view.addGestureRecognizer(tap)
+
+
         // UI etat de base
         pickerSeparateur.isHidden = true
         pickerEspacement.isHidden = true
@@ -171,9 +220,7 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
         
     }
     
-    
-    
-    
+
     // Switch
     // Fonction appelée quand l'utilisateur change l'état du switch
     
@@ -214,14 +261,17 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
     
     // Change le visuel quand le phonétique est activé
     func updateUISwitchPhonetique(isSwitchOn: Bool) {
+        
         // Change l'opacité pour montrer la désactivation
         sousVue1.alpha = isSwitchOn ? 0.5 : 1.0
         sousVue2.alpha = isSwitchOn ? 0.5 : 1.0
+        
         // Désactive l'interaction si activé
         sousVue1.isUserInteractionEnabled = !isSwitchOn
         sousVue2.isUserInteractionEnabled = !isSwitchOn
         
         textPhonetique.isEnabled = isSwitchOn ? true : false
+        textPhonetique.text = ""
     }
     
     
@@ -306,69 +356,99 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
            pickerEspacement.setNeedsLayout()
     }
     
-    
-
-    
-    
     // Générateur mot de passe
     
     func genererMotDePasse() {
-        var base = 0
         var caracteres = [Character]() // Initialisation
+        var obligatoires = [Character]() // Initialisation des caractères obligatoires pour garantir l'option cochée
         
         if switchSymbole.isOn {
             caracteres += symboles
-            base += 22
+            obligatoires.append(symboles.randomElement()!)
         }
         if switchMajuscule.isOn {
             caracteres += majuscules
-            base += 26
+            obligatoires.append(majuscules.randomElement()!)
         }
         if switchChiffre.isOn {
             caracteres += chiffres
-            base += 10
+            obligatoires.append(chiffres.randomElement()!)
         }
         if switchMinuscule.isOn {
             caracteres += minuscules
-            base += 26
+            obligatoires.append(minuscules.randomElement()!)
         }
 
         // Vérifier si au moins une catégorie est sélectionnée
         guard !caracteres.isEmpty else {
             textMotdepasse.text = "Sélectionnez au moins une option !"
-            
+
             complexiteMdp.text = "0 bits"
             motComplexite.text = "Néant"
             motComplexite.textColor = UIColor.black
             barComplexite.progress = 0.0
             return
         }
+        
+        caracteres.shuffle() // Uniformiser le tableau
+    
+        let espacement = espacementSelectionnee
 
-        caracteres.shuffle()
+        /* Calcul du nombre de caractères réels (en respectant la position des séparateurs)
         
-        var resultat = ""
-        var i = 0
-        var j = 0
+         nbCaracteresReels = longueur * (espacement/espacement+1)
+         espacement/espacement+1 = proportion de groupe dans le mot de passe
+         
+         exemple : longueur 10, espacement 1 : x-x-x-x-x-
+         
+         10 * (1/2) = 10 * 0.5 = 5 caractères réels
+        */
         
-        // Ajout du séparateur
-        repeat {
-            resultat += String(caracteres.randomElement() ?? "x")
-            i += 1
-            if switchSeparateur.isOn, i % espacementSelectionnee == 0 {
-                resultat += separateurSelectionnee
-                j += 1
-            }
+        var nbCaracteresReels: Int
+        
+        if switchSeparateur.isOn {
+            nbCaracteresReels = Int((Double(longueurSelectionnee) * Double(espacement) / Double(espacement + 1)).rounded())
+        } else {
+            nbCaracteresReels = longueurSelectionnee
+        }
+
+        guard nbCaracteresReels >= obligatoires.count else {
+            textMotdepasse.text = "Longueur trop courte pour inclure chaque type"
+            return
+        }
+
+        // Construire le mot de passe brut (sans séparateurs)
+        var motSansSeparateur = obligatoires
+        while motSansSeparateur.count < nbCaracteresReels {
+            motSansSeparateur.append(caracteres.randomElement()!)
+        }
+
+        motSansSeparateur.shuffle()
+        
+        // mdp final en ajoutant séparateur si il y en a
+        var motFinal = ""
+        
+        // .enumerated permet d'avoir l'index et le caractère
+        for (index, char) in motSansSeparateur.enumerated() {
+            motFinal.append(char)
             
-        } while (i + j < longueurSelectionnee)
-
-        if resultat.count > longueurSelectionnee {
-            resultat.removeLast(resultat.count - longueurSelectionnee)
+            if switchSeparateur.isOn,
+               (index + 1) % espacement == 0,
+               motFinal.count < longueurSelectionnee {
+                motFinal.append(separateurSelectionnee)
+            }
         }
         
        
-        complexiteMdp(Int(longueurSelectionnee), base, 6)
-        textMotdepasse.text = resultat
-       
+        // Cas ou le mot final est < a la longueur donc on rajoute un caractère. Exemple : Longueur 14 et espacement 7, le mot final sera - 1 la longueur
+        
+        if motFinal.count < longueurSelectionnee { motFinal.append(caracteres.randomElement()!)}
+        
+        print("Longueur mot final : \(motFinal.count)")
+        print("Longueur choisi : \(longueurSelectionnee)")
+
+        textMotdepasse.text = motFinal
+        complexiteMdp(motFinal)
     }
     
     
@@ -388,15 +468,49 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
      
      */
     
-    func complexiteMdp (_ longueur: Int, _ base: Int, _ k: Int) {
+    func complexiteMdp (_ mdp: String) {
         var E: Double = 0.0
         var arrondiE: Double = 0.0
+        let k = 6 // 6 pour le nombre de sépérateur
+
+        var base = 0
+        let tabInput: [Character] = Array(mdp)
+        let longueur = Double(tabInput.count)
+        var maj = false
+        var min = false
+        var num = false
+        var sym = false
+        var autres = false // Autres caractères non-ASCII
         
+        for char in tabInput {
+            if let ascii = char.asciiValue {
+                if !maj && ascii >= 65 && ascii <= 90 {
+                    maj = true
+                } else if !min && ascii >= 97 && ascii <= 122 {
+                    min = true
+                } else if !num && ascii >= 48 && ascii <= 57 {
+                    num = true
+                } else if !sym && (
+                    (ascii >= 33 && ascii <= 47) ||
+                    (ascii >= 58 && ascii <= 64) ||
+                    (ascii >= 91 && ascii <= 96) ||
+                    (ascii >= 123 && ascii <= 126)
+                ) {
+                    sym = true
+                }
+            } else { autres = true}
+        }
+        
+        if maj { base += 26 }
+        if min { base += 26 }
+        if num { base += 10 }
+        if sym { base += 33 }
+        if autres { base += 150 }
         
         if switchSeparateur.isOn {
             var coefBinomial: Double = 1.0
             
-            for i in 0..<k {
+            for i in 0..<k { // 6 pour le nombre de séparateur
                 coefBinomial *= (Double(longueur-1) - Double(i))
                 coefBinomial /= (Double(i) + 1)
             }
@@ -406,27 +520,33 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
             E = Double(longueur) * log2(Double(base))
         }
         
-        arrondiE = round(10*E)/10
+        
+        
+        arrondiE = round(100*E)/100
         complexiteMdp.text = String(arrondiE) + " bits"
         
-    
+        // Vérifie si arrondiE peut etre infini ou NaN
+        guard arrondiE.isFinite, !arrondiE.isNaN else {
+            print("Erreur : valeur non convertible en Int (\(arrondiE))")
+            return
+        }
+        
         switch Int(arrondiE) {
         case (0...27):
             motComplexite.textColor = UIColor(ciColor: CIColor(red: 220/225, green: 20/255, blue: 60/255, alpha: 1))
-            motComplexite.text = "Très faible"
+            motComplexite.text = "Très faible ⚠️"
         case (28...35):
             motComplexite.textColor = UIColor(ciColor: CIColor(red: 255/255, green: 140/255, blue: 0/255, alpha: 1))
-            motComplexite.text = "Faible"
+            motComplexite.text = "Faible ⚠️"
         case (36...59):
             motComplexite.textColor = UIColor(ciColor: CIColor(red: 255/255, green: 215/255, blue: 0/255, alpha: 1))
-            motComplexite.text = "Moyen"
+            motComplexite.text = "Moyen ⚠️"
         case (60...128):
-            
-            motComplexite.text = "Fort"
+            motComplexite.text = "Fort ☑️"
             motComplexite.textColor = UIColor(ciColor: CIColor(red: 50/255, green: 205/255, blue: 50/255, alpha: 1))
         case (127...):
             motComplexite.textColor = UIColor(ciColor: CIColor(red: 0/255, green: 128/255, blue: 0/255, alpha: 1))
-            motComplexite.text = "Très fort"
+            motComplexite.text = "Très fort ✅"
         default:
             motComplexite.text = "Erreur"
         }
@@ -446,6 +566,34 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
     }
     
     
+    @IBAction func copierMdp(_ sender: UIButton) {
+        guard let motDePasse = textMotdepasse.text, !motDePasse.isEmpty else { return }
+            UIPasteboard.general.string = motDePasse
+            afficherToast(message: "Mot de passe copié !")
+    }
     
-    // Reste à faire : garantir qu'une option soit bien dans le mdp.
+    
+    // ChatGPT
+    func afficherToast(message: String, duree: Double = 2.0) {
+        let toastLabel = UILabel(frame: CGRect(x: self.view.frame.size.width/2 - 150, y: self.view.frame.size.height - 100, width: 300, height: 35))
+        toastLabel.backgroundColor = UIColor.black.withAlphaComponent(0.7)
+        toastLabel.textColor = UIColor.white
+        toastLabel.textAlignment = .center
+        toastLabel.font = UIFont.systemFont(ofSize: 14.0)
+        toastLabel.text = message
+        toastLabel.alpha = 0.0
+        toastLabel.layer.cornerRadius = 10
+        toastLabel.clipsToBounds = true
+        self.view.addSubview(toastLabel)
+
+        UIView.animate(withDuration: 0.5, animations: {
+            toastLabel.alpha = 1.0
+        }) { _ in
+            UIView.animate(withDuration: 0.5, delay: duree, options: .curveEaseOut, animations: {
+                toastLabel.alpha = 0.0
+            }) { _ in
+                toastLabel.removeFromSuperview()
+            }
+        }
+    }
 }
