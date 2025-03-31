@@ -534,20 +534,25 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
         switch Int(arrondiE) {
         case (0...27):
             motComplexite.textColor = UIColor(ciColor: CIColor(red: 220/225, green: 20/255, blue: 60/255, alpha: 1))
+            barComplexite.progressTintColor = UIColor.red // Couleur de la progressBar
             motComplexite.text = "Très faible ⚠️"
         case (28...35):
             motComplexite.textColor = UIColor(ciColor: CIColor(red: 255/255, green: 140/255, blue: 0/255, alpha: 1))
             motComplexite.text = "Faible ⚠️"
         case (36...59):
             motComplexite.textColor = UIColor(ciColor: CIColor(red: 255/255, green: 215/255, blue: 0/255, alpha: 1))
+            barComplexite.progressTintColor = UIColor.orange
             motComplexite.text = "Moyen ⚠️"
         case (60...128):
             motComplexite.text = "Fort ☑️"
+            barComplexite.progressTintColor = UIColor.green
             motComplexite.textColor = UIColor(ciColor: CIColor(red: 50/255, green: 205/255, blue: 50/255, alpha: 1))
         case (127...):
             motComplexite.textColor = UIColor(ciColor: CIColor(red: 0/255, green: 128/255, blue: 0/255, alpha: 1))
+            barComplexite.progressTintColor = UIColor(red: 0.0, green: 0.5, blue: 0.0, alpha: 1.0)
             motComplexite.text = "Très fort ✅"
         default:
+            barComplexite.progressTintColor = UIColor.black
             motComplexite.text = "Erreur"
         }
         
@@ -563,6 +568,7 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
         } else {
             barComplexite.progress = 1.0
         }
+        
     }
     
     
