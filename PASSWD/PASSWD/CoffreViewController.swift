@@ -27,7 +27,12 @@ extension UILabel {
     }
 }
 
-class CoffreViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class CoffreViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, AjouterMDPDelegate {
+    
+    @IBOutlet weak var supprimer: UIButton!
+    @IBOutlet weak var copier: UIButton!
+    @IBOutlet weak var annuler: UIButton!
+    
     
     
     // Variables nécessaires à l'ajout de mdp
@@ -42,6 +47,8 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
     
     var lines: [String] = []
     
+    var ligneSelectionnee: Int?
+    
     // Source pour la création de la table UITableView:
     // "www.youtube.com/watch?v=C36sb5sc6lE"
     
@@ -51,6 +58,9 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // Récupérer la ligne
+        ligneSelectionnee = indexPath.row
+        
         // Récupérer la cellule
         if let cell = tableView.cellForRow(at: indexPath) as? nCell {
             // Diviser la ligne en fonction de la virgule
@@ -61,8 +71,13 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
                 // Afficher le mot de passe en clair dans label3
                 cell.label3.text = String(line[2]) // Affiche le mot de passe en clair
             }
+            
+            supprimer.isHidden = false
+            copier.isHidden = false
+            annuler.isHidden = false
         }
     }
+    
     
     func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
         // Récupérer la cellule
@@ -112,68 +127,161 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
     
     @IBOutlet var vue: UIView!
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         tableView.delegate = self
         tableView.dataSource = self
-        
+    
         // Ouverture du fichier
-        RafraichirBase()
-        
-        // Do any additional setup after loading the view.
+        vue.isHidden = true
     }
     
     
     override func viewDidAppear(_ animated: Bool) {
             super.viewDidAppear(animated)
-                
-            verifierBiometrie()
-        }
-    
-    
-    func AjoutMDP() {
+        vue.isHidden = true
+        supprimer.isHidden = true
+        copier.isHidden = true
+        annuler.isHidden = true
         
-        // Lecture du fichier
-        if let fileURL = Bundle.main.url(forResource: "passwd", withExtension: "db") {
-            do {
-                
-                // Generation de la ligne à inserer
-                let text = "\(application),\(login),\(mdp)" //just a text
-                try text.write(to: fileURL, atomically: false, encoding: .utf8)
-                tableView.reloadData()
-                
-            } catch {
-                // Gérer les erreurs de lecture du fichier
-                print("Erreur lors de la lecture du fichier: \(error.localizedDescription)")
-            }
-        } else {
-            print("Le fichier n'a pas été trouvé dans le bundle.")
-        }
-        
+        verifierBiometrie()
+        RafraichirBase()
     }
     
-    func RafraichirBase(){
-        if let fileURL = Bundle.main.url(forResource: "passwd", withExtension: "db") {
-            do {
-                // Lire le contenu du fichier avec l'encodage isoLatin1
-                let contenu = try String(contentsOf: fileURL, encoding: .isoLatin1)
-                
-                // Diviser le contenu en lignes et itérer sur chaque ligne
-                let temp = contenu.split(separator: "\n") // On charge le contenu dans une valeur temp
-                lines = temp.map { String($0) } // On tranforme temp en un tableau de String
-                nbLignes = lines.count
-                tableView.reloadData()
-                
-            } catch {
-                // Gérer les erreurs de lecture du fichier
-                print("Erreur lors de la lecture du fichier: \(error.localizedDescription)")
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        deselectionnerLigne()
+        
+        // Masquer la vue quand on la quitte
+        vue.isHidden = true
+        
+    }
+
+    
+    func deselectionnerLigne() {
+        if let index = tableView.indexPathForSelectedRow {
+            tableView.deselectRow(at: index, animated: true)
+
+            if let cell = tableView.cellForRow(at: index) as? nCell {
+                cell.label3.text = "•••••••••••••••"
             }
-        } else {
-            print("Le fichier n'a pas été trouvé dans le bundle.")
+
+            supprimer.isHidden = true
+            copier.isHidden = true
+            annuler.isHidden = true
+            supprimer.isHidden = true
+            ligneSelectionnee = nil
         }
     }
+
+    
+    
+    @IBAction func boutonSupprimer(_ sender: UIButton) {
+        guard let index = ligneSelectionnee else {
+            print("Aucune ligne sélectionnée.")
+            return
+        }
+        
+        // 1. Supprimer la ligne du tableau
+        lines.remove(at: index)
+        nbLignes = lines.count
+
+        // 2. Réécrire le fichier entier
+        if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let fileURL = documentsDirectory.appendingPathComponent("passwd.db")
+            let nouveauContenu = lines.joined(separator: "\n") + "\n"
+            
+            do {
+                try nouveauContenu.write(to: fileURL, atomically: true, encoding: .utf8)
+                print("Ligne supprimée et fichier mis à jour.")
+            } catch {
+                print("Erreur lors de la mise à jour du fichier : \(error.localizedDescription)")
+            }
+        }
+
+        deselectionnerLigne()
+        
+        // Rafraîchir la table
+        tableView.reloadData()
+        print("Nouvelles données : \(lines)")
+    }
+    
+    
+    @IBAction func boutonCopier(_ sender: UIButton) {
+        guard let ligne = ligneSelectionnee else { return }
+        
+        let champs = lines[ligne].split(separator: ",")
+        if champs.count >= 3 {
+           let motDePasse = String(champs[2])
+           UIPasteboard.general.string = motDePasse
+           afficherToast(message: "Mot de passe copié !")
+        }
+        deselectionnerLigne()
+    }
+    
+    
+    func afficherToast(message: String, duree: Double = 2.0) {
+        let toastLabel = UILabel(frame: CGRect(x: self.view.frame.size.width/2 - 150, y: self.view.frame.size.height - 150, width: 300, height: 30))
+        toastLabel.backgroundColor = UIColor.black.withAlphaComponent(0.7)
+        toastLabel.textColor = UIColor.white
+        toastLabel.textAlignment = .center
+        toastLabel.font = UIFont.systemFont(ofSize: 14.0)
+        toastLabel.text = message
+        toastLabel.alpha = 0.0
+        toastLabel.layer.cornerRadius = 10
+        toastLabel.clipsToBounds = true
+        self.view.addSubview(toastLabel)
+
+        UIView.animate(withDuration: 0.5, animations: {
+            toastLabel.alpha = 1.0
+        }) { _ in
+            UIView.animate(withDuration: 0.5, delay: duree, options: .curveEaseOut, animations: {
+                toastLabel.alpha = 0.0
+            }) { _ in
+                toastLabel.removeFromSuperview()
+            }
+        }
+    }
+    
+    @IBAction func boutonAnnuler(_ sender: UIButton) {
+        deselectionnerLigne()
+    }
+    
+    
+    
+    
+    func RafraichirBase() {
+        if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let fileURL = documentsDirectory.appendingPathComponent("passwd.db")
+
+            // Vérifie si le fichier existe avant d’essayer de lire
+            if FileManager.default.fileExists(atPath: fileURL.path) {
+                do {
+                    let contenu = try String(contentsOf: fileURL, encoding: .utf8)
+                    let temp = contenu.split(separator: "\n")
+                    
+                    // Tri par nom d'app alphabétique
+                    lines = temp.map { String($0) }.sorted { ligne1, ligne2 in
+                        let app1 = ligne1.split(separator: ",").first?.lowercased() ?? ""
+                        let app2 = ligne2.split(separator: ",").first?.lowercased() ?? ""
+                        return app1 < app2
+                    }
+                    
+                    nbLignes = lines.count
+                    tableView.reloadData()
+                    print("Contenu actuel : \(lines)")
+                } catch {
+                    print("Erreur lors de la lecture du fichier: \(error.localizedDescription)")
+                }
+            } else {
+                print("⚠️ Fichier introuvable dans Documents : \(fileURL.path)")
+            }
+        }
+    }
+
     
     
     func verifierBiometrie() {
@@ -191,6 +299,7 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
                         self.vue.isHidden = false
                     } else {
                         // ❌ Échec ou annulation → retour
+                        self.vue.isHidden = true
                         self.fermerVueOuRetour()
                     }
                 }
@@ -214,20 +323,17 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
     
     
     
-    
-    
-    
-    
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    // Delegate appelé quand un mot de passe est ajouté
+    func didAjouterMDP() {
+        RafraichirBase()
     }
-    */
+    
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        if let destination = segue.destination as? AjouterMDPViewController {
+            destination.delegate = self  // 👈 on devient le delegate
+        }
+    }
 
 }

@@ -7,20 +7,76 @@
 
 import UIKit
 
-class AjouterMDPViewController: UIViewController {
+// Protocol permet de communiquer entre deux vues.
+// Ici nous voulons utiliser la fonction RafraichirMdp() après avoir rajouter des données à la BD
+protocol AjouterMDPDelegate: AnyObject {
+    func didAjouterMDP()
+}
+
+
+
+class AjouterMDPViewController: UIViewController, UITextFieldDelegate {
     
     @IBOutlet weak var application: UITextField!
     @IBOutlet weak var login: UITextField!
     @IBOutlet weak var mdp: UITextField!
     
+    // Delegate
+    weak var delegate: AjouterMDPDelegate?
+    
     var annule = false
     var ajout = false
+    
+    
+    @IBOutlet weak var enregistrer: UIButton!
+    @IBOutlet weak var message: UILabel!
+    
+    @IBOutlet var champTexte: [UITextField]!
+    
+    @IBAction func verifText2(_ sender: UITextField) {
+        message.isHidden = true
+        if application.text != "" && login.text != "" && mdp.text != "" {
+            enregistrer.isEnabled = true
+        } else {
+            enregistrer.isEnabled = false
+        }
+    }
+    
+    
+    @IBAction func verifText(_ sender: Any) {
+//        if application.text != "" && login.text != "" && mdp.text != "" {
+//            enregistrer.isEnabled = true
+//        } else {
+//            enregistrer.isEnabled = false
+//        }
+    }
+    
+    
+    @objc func cacherClavier() {
+        view.endEditing(true)
+    }
     
     override func viewDidLoad() {
         annule = false
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        application.delegate = self
+        login.delegate = self
+        mdp.delegate = self
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(cacherClavier))
+        view.addGestureRecognizer(tap)
+        
+        enregistrer.isEnabled = false
+        message.isHidden = true
+        
+        
+        // enlever l'autocorrection
+        for champ in champTexte {
+            champ.autocorrectionType = .no
+            champ.spellCheckingType = .no
+        }
+        
     }
     
     
@@ -35,59 +91,53 @@ class AjouterMDPViewController: UIViewController {
     //var c: CoffreViewController!
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        //c = segue.destination as! CoffreViewController
+       
     }
     
-    /*func AjoutMDP(){
-        // Lecture du fichier
-        if let fileURL = Bundle.main.url(forResource: "passwd", withExtension: "db") {
-            do {
-                
-                // Generation de la ligne à inserer
-                
-                let text = "\(application.text ?? ""),\(login.text ?? ""),\(mdp.text ?? "")" //just a text
-                try text.write(to: fileURL, atomically: false, encoding: .utf8)
-                print(text)
-            } catch {
-                // Gérer les erreurs de lecture du fichier
-                print("Erreur lors de la lecture du fichier: \(error.localizedDescription)")
-            }
-        } else {
-            print("Le fichier n'a pas été trouvé dans le bundle.")
-        }
-    }*/
     
-    func AjoutMDP(){
-        // Lecture du fichier
-        if let fileURL = Bundle.main.url(forResource: "passwd", withExtension: "db") {
+    func AjoutMDP() {
+        let texte = "\(application.text ?? ""),\(login.text ?? ""),\(mdp.text ?? "")\n"
+        
+        // Récupération du chemin vers le dossier Documents
+        if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let fileURL = documentsDirectory.appendingPathComponent("passwd.db")
+            
             do {
-                let texte = "\(application.text ?? ""),\(login.text ?? ""),\(mdp.text ?? "")" //just a text
-                if let data = texte.data(using: .utf8) {
-                    do {
-                        let fileHandle = try FileHandle(forWritingTo: fileURL)
-                        fileHandle.seekToEndOfFile() // Se positionner à la fin du fichier
-                        if let data = texte.data(using: .utf8) {
-                            fileHandle.write(data) // Écrire les nouvelles données
-                        }
-                        print("Fichier écrit avec succès à \(fileURL.path)")
-                    } catch {
-                        print("Erreur lors de l'écriture du fichier : \(error)")
+                // Vérifie si le fichier existe déjà
+                if FileManager.default.fileExists(atPath: fileURL.path) {
+                    let fileHandle = try FileHandle(forWritingTo: fileURL)
+                    fileHandle.seekToEndOfFile()
+                    if let data = texte.data(using: .utf8) {
+                        fileHandle.write(data)
                     }
+                    fileHandle.closeFile()
+                } else {
+                    // Sinon, créer un nouveau fichier
+                    try texte.write(to: fileURL, atomically: true, encoding: .utf8)
                 }
+                print("Données écrites avec succès dans : \(fileURL.path)")
+                print("Ajouté au fichier : \(texte)")
+                
+                // Appel du delegate
+                delegate?.didAjouterMDP()
             } catch {
-                // Gérer les erreurs de lecture du fichier
-                print("Erreur lors de la lecture du fichier: \(error.localizedDescription)")
+                print("Erreur lors de l'écriture du fichier : \(error)")
             }
-        } else {
-            print("Le fichier n'a pas été trouvé dans le bundle.")
         }
     }
+
     
     @IBAction func fermer(_ sender: UIButton) {
-        if sender.tag == 0 {AjoutMDP()} // Si on annulé on passe le booléen à false
+        if sender.tag == 0 {
+            if application.text != "" && login.text != "" && mdp.text != "" {
+                AjoutMDP()
+            } else {
+                message.isHidden = false
+                return
+            }
+        }
+        
         self.dismiss(animated: true, completion: nil)
+        
     }
-    
-    
-
 }

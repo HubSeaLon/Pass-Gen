@@ -348,6 +348,9 @@ class CalculateurViewController: UIViewController, UITextFieldDelegate {
                 print("Le fichier seclist.txt est introuvable dans le bundle.")
             }
         }
+        
+        mdpInput.autocorrectionType = .no
+        mdpInput.spellCheckingType = .no
     }
 
 

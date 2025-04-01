@@ -10,7 +10,6 @@
 		81C196BD2D98BC0F0082D24C /* CoffreViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C196BC2D98BC0F0082D24C /* CoffreViewController.swift */; };
 		81C302382D95ADB700860A62 /* seclist.txt in Resources */ = {isa = PBXBuildFile; fileRef = 81C302372D95ADB700860A62 /* seclist.txt */; };
 		E409422B2D959C2000F3C50F /* CalculateurViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E409422A2D959C2000F3C50F /* CalculateurViewController.swift */; };
-		E43B2E5D2D9AD46D00E53FE1 /* passwd.db in Resources */ = {isa = PBXBuildFile; fileRef = E43B2E5C2D9AD46D00E53FE1 /* passwd.db */; };
 		E45A78D82D9AFE3200487315 /* AjouterMDPViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A78D72D9AFE3200487315 /* AjouterMDPViewController.swift */; };
 		E4C6A07A2D8AE94500371A6B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C6A0792D8AE94500371A6B /* AppDelegate.swift */; };
 		E4C6A07C2D8AE94500371A6B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C6A07B2D8AE94500371A6B /* SceneDelegate.swift */; };
@@ -45,7 +44,6 @@
 		81C196BC2D98BC0F0082D24C /* CoffreViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoffreViewController.swift; sourceTree = "<group>"; };
 		81C302372D95ADB700860A62 /* seclist.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = seclist.txt; sourceTree = "<group>"; };
 		E409422A2D959C2000F3C50F /* CalculateurViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalculateurViewController.swift; sourceTree = "<group>"; };
-		E43B2E5C2D9AD46D00E53FE1 /* passwd.db */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = passwd.db; sourceTree = "<group>"; };
 		E45A78D72D9AFE3200487315 /* AjouterMDPViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AjouterMDPViewController.swift; sourceTree = "<group>"; };
 		E4C6A0762D8AE94500371A6B /* PASSWD.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PASSWD.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4C6A0792D8AE94500371A6B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -122,7 +120,6 @@
 				E409422A2D959C2000F3C50F /* CalculateurViewController.swift */,
 				81C302372D95ADB700860A62 /* seclist.txt */,
 				81C196BC2D98BC0F0082D24C /* CoffreViewController.swift */,
-				E43B2E5C2D9AD46D00E53FE1 /* passwd.db */,
 				E45A78D72D9AFE3200487315 /* AjouterMDPViewController.swift */,
 			);
 			path = PASSWD;
@@ -249,7 +246,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E43B2E5D2D9AD46D00E53FE1 /* passwd.db in Resources */,
 				81C302382D95ADB700860A62 /* seclist.txt in Resources */,
 				E4C6A0832D8AE94600371A6B /* Assets.xcassets in Resources */,
 				E4C6A0862D8AE94600371A6B /* Base in Resources */,

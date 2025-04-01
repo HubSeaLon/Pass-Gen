@@ -204,6 +204,9 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
         updateUISwitchPhonetique(isSwitchOn: false)
 
         initialisationVueMdp()
+        
+        textPhonetique.autocorrectionType = .no
+        textPhonetique.spellCheckingType = .no
     }
     
     
@@ -581,7 +584,12 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
     
     // ChatGPT
     func afficherToast(message: String, duree: Double = 2.0) {
-        let toastLabel = UILabel(frame: CGRect(x: self.view.frame.size.width/2 - 150, y: self.view.frame.size.height - 100, width: 300, height: 35))
+        let toastWidth: CGFloat = 200
+        let toastHeight: CGFloat = 30
+        let toastX = self.view.frame.size.width / 2 - toastWidth / 2
+        let toastY = self.view.frame.size.height - 242
+
+        let toastLabel = UILabel(frame: CGRect(x: toastX, y: toastY, width: toastWidth, height: toastHeight))
         toastLabel.backgroundColor = UIColor.black.withAlphaComponent(0.7)
         toastLabel.textColor = UIColor.white
         toastLabel.textAlignment = .center
@@ -590,6 +598,7 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
         toastLabel.alpha = 0.0
         toastLabel.layer.cornerRadius = 10
         toastLabel.clipsToBounds = true
+
         self.view.addSubview(toastLabel)
 
         UIView.animate(withDuration: 0.5, animations: {
@@ -602,4 +611,5 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
             }
         }
     }
+
 }
