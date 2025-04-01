@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		81C196BD2D98BC0F0082D24C /* CoffreViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C196BC2D98BC0F0082D24C /* CoffreViewController.swift */; };
 		81C302382D95ADB700860A62 /* seclist.txt in Resources */ = {isa = PBXBuildFile; fileRef = 81C302372D95ADB700860A62 /* seclist.txt */; };
+		D62EB83E2D9C13B7002811FF /* ProposViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D62EB83D2D9C13B7002811FF /* ProposViewController.swift */; };
+		D62EB8402D9C16D9002811FF /* EntropieViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D62EB83F2D9C16D9002811FF /* EntropieViewController.swift */; };
+		D67A39752D9C0A0B0024145B /* SettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D67A39742D9C0A0B0024145B /* SettingViewController.swift */; };
 		E409422B2D959C2000F3C50F /* CalculateurViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E409422A2D959C2000F3C50F /* CalculateurViewController.swift */; };
 		E45A78D82D9AFE3200487315 /* AjouterMDPViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A78D72D9AFE3200487315 /* AjouterMDPViewController.swift */; };
 		E4C6A07A2D8AE94500371A6B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C6A0792D8AE94500371A6B /* AppDelegate.swift */; };
@@ -43,6 +46,9 @@
 /* Begin PBXFileReference section */
 		81C196BC2D98BC0F0082D24C /* CoffreViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoffreViewController.swift; sourceTree = "<group>"; };
 		81C302372D95ADB700860A62 /* seclist.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = seclist.txt; sourceTree = "<group>"; };
+		D62EB83D2D9C13B7002811FF /* ProposViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProposViewController.swift; sourceTree = "<group>"; };
+		D62EB83F2D9C16D9002811FF /* EntropieViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntropieViewController.swift; sourceTree = "<group>"; };
+		D67A39742D9C0A0B0024145B /* SettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
 		E409422A2D959C2000F3C50F /* CalculateurViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalculateurViewController.swift; sourceTree = "<group>"; };
 		E45A78D72D9AFE3200487315 /* AjouterMDPViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AjouterMDPViewController.swift; sourceTree = "<group>"; };
 		E4C6A0762D8AE94500371A6B /* PASSWD.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PASSWD.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -89,6 +95,7 @@
 		E4C6A06D2D8AE94500371A6B = {
 			isa = PBXGroup;
 			children = (
+				D62EB83F2D9C16D9002811FF /* EntropieViewController.swift */,
 				E4C6A0782D8AE94500371A6B /* PASSWD */,
 				E4C6A08F2D8AE94600371A6B /* PASSWDTests */,
 				E4C6A0992D8AE94600371A6B /* PASSWDUITests */,
@@ -113,7 +120,9 @@
 				E4C6A07B2D8AE94500371A6B /* SceneDelegate.swift */,
 				E4C6A07D2D8AE94500371A6B /* ViewController.swift */,
 				E4C6A07F2D8AE94500371A6B /* Main.storyboard */,
+				D62EB83D2D9C13B7002811FF /* ProposViewController.swift */,
 				E4C6A0A92D8AF26200371A6B /* GenerationViewController.swift */,
+				D67A39742D9C0A0B0024145B /* SettingViewController.swift */,
 				E4C6A0822D8AE94600371A6B /* Assets.xcassets */,
 				E4C6A0842D8AE94600371A6B /* LaunchScreen.storyboard */,
 				E4C6A0872D8AE94600371A6B /* Info.plist */,
@@ -277,6 +286,9 @@
 				E4C6A0AA2D8AF26200371A6B /* GenerationViewController.swift in Sources */,
 				E409422B2D959C2000F3C50F /* CalculateurViewController.swift in Sources */,
 				E4C6A07E2D8AE94500371A6B /* ViewController.swift in Sources */,
+				D62EB83E2D9C13B7002811FF /* ProposViewController.swift in Sources */,
+				D62EB8402D9C16D9002811FF /* EntropieViewController.swift in Sources */,
+				D67A39752D9C0A0B0024145B /* SettingViewController.swift in Sources */,
 				E45A78D82D9AFE3200487315 /* AjouterMDPViewController.swift in Sources */,
 				81C196BD2D98BC0F0082D24C /* CoffreViewController.swift in Sources */,
 				E4C6A07A2D8AE94500371A6B /* AppDelegate.swift in Sources */,

@@ -9,6 +9,7 @@ import UIKit
 
 // Protocol permet de communiquer entre deux vues.
 // Ici nous voulons utiliser la fonction RafraichirMdp() après avoir rajouter des données à la BD
+
 protocol AjouterMDPDelegate: AnyObject {
     func didAjouterMDP()
 }
