@@ -11,7 +11,7 @@ import UIKit
 // Ici nous voulons utiliser la fonction RafraichirMdp() après avoir rajouter des données à la BD
 
 
-// Protocol créé pour pouvoir utiliser la fonction RafraichirBase() dans la ue CoffreViewController
+// Protocol créé pour pouvoir utiliser la fonction RafraichirBase() dans la vue CoffreViewController
 protocol AjouterMDPDelegate: AnyObject {
     func didAjouterMDP()
 }
@@ -68,7 +68,7 @@ class AjouterMDPViewController: UIViewController, UITextFieldDelegate {
         login.delegate = self
         mdp.delegate = self
         
-        // QUand on tape autre part pour cacher le clavier (GPT)
+        // Quand on tape autre part pour cacher le clavier (GPT)
         let tap = UITapGestureRecognizer(target: self, action: #selector(cacherClavier))
         view.addGestureRecognizer(tap)
         
@@ -94,6 +94,7 @@ class AjouterMDPViewController: UIViewController, UITextFieldDelegate {
             do {
                 // Vérifie si le fichier existe déjà
                 if FileManager.default.fileExists(atPath: fileURL.path) {
+                    // Ajout des données dans le fichier
                     let fileHandle = try FileHandle(forWritingTo: fileURL)
                     fileHandle.seekToEndOfFile()
                     if let data = texte.data(using: .utf8) {

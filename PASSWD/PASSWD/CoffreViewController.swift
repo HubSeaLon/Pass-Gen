@@ -74,12 +74,12 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
         // Récupérer la cellule
         if let cell = tableView.cellForRow(at: indexPath) as? nCell {
             // Diviser la ligne en fonction de la virgule
-            let line = lines[indexPath.row].split(separator: ",") // Exemple de séparation par ","
+            let line = lines[indexPath.row].split(separator: ",")
 
             // Assurez-vous qu'il y a bien 3 éléments dans la ligne
             if line.count > 2 {
                 // Afficher le mot de passe en clair dans label3
-                cell.label3.text = String(line[2]) // Affiche le mot de passe en clair
+                cell.label3.text = String(line[2])
             }
             
             supprimer.isHidden = false
@@ -93,11 +93,11 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
         // Récupérer la cellule
         if let cell = tableView.cellForRow(at: indexPath) as? nCell {
             // Diviser la ligne en fonction de la virgule
-            let line = lines[indexPath.row].split(separator: ",") // Exemple de séparation par ","
+            let line = lines[indexPath.row].split(separator: ",")
 
-            // Assurez-vous qu'il y a bien 3 éléments dans la ligne
+            // S'assurer qu'il y a bien 3 éléments dans la ligne
             if line.count > 2 {
-                // Afficher le mot de passe en clair dans label3
+                // Masquer le mot de passe en clair dans label3
                 cell.label3.text = "•••••••••••••••"
             }
         }
@@ -190,7 +190,7 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     
-    // Recherche dans la bar selon le nom d'app
+    // Recherche dans la bar selon le nom d'app et au changement dans la bar de recherche
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText.isEmpty {
             rechercheActive = false
@@ -199,8 +199,11 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
         } else {
             rechercheActive = true
             deselectionnerLigne()
+            
             lignesFiltrees = lines.filter { line in
+                // Extraction du nom de l'app avant la première virgule et prise en compte de la casse
                 let appName = line.split(separator: ",").first?.lowercased() ?? ""
+                // On garde les noms d'app qui correspondent à la recherche
                 return appName.contains(searchText.lowercased())
             }
         }
@@ -313,7 +316,7 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
     // Chargement des données
     func RafraichirBase() {
         if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
-            let fileURL = documentsDirectory.appendingPathComponent("passwd.db")
+            let fileURL = documentsDirectory.appendingPathComponent("passwd.db") // Chargement du fichier local dans Documents
 
             // Vérifie si le fichier existe avant d’essayer de lire
             if FileManager.default.fileExists(atPath: fileURL.path) {
@@ -322,10 +325,10 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
                     let temp = contenu.split(separator: "\n")
                     
                     // Tri par nom d'app alphabétique
-                    lines = temp.map { String($0) }.sorted { ligne1, ligne2 in
-                        let app1 = ligne1.split(separator: ",").first?.lowercased() ?? ""
+                    lines = temp.map { String($0) }.sorted { ligne1, ligne2 in   // convertion en String et tri les lignes 2 à 2
+                        let app1 = ligne1.split(separator: ",").first?.lowercased() ?? "" // Extraction des nom d'app
                         let app2 = ligne2.split(separator: ",").first?.lowercased() ?? ""
-                        return app1 < app2
+                        return app1 < app2 // Compare les deux noms
                     }
                     
                     nbLignes = lines.count
@@ -348,6 +351,8 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
 
     
     /* Fonction pour vérifier la biométrie (FaceID, TouchID ou code de l'iPhone)
+    
+    Documentation : https://developer.apple.com/documentation/localauthentication/logging-a-user-into-your-app-with-face-id-or-touch-id
      
     Prérequis :
     - Avoir un apple developer ID
@@ -360,10 +365,11 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
         var error: NSError?
 
 
-        // Autorise Face ID, Touch ID ou code de l'appareil
+        // Vérifie si l'appareil peut utiliser le Face ID ou Touch ID
         if context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) {
             let raison = "Authentifiez-vous pour accéder à votre coffre"
 
+            // Processus d'authentification aynchrone
             context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: raison) { success, authError in
                 DispatchQueue.main.async {
                     if success {
@@ -380,7 +386,7 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
                 }
             }
         } else {
-            // Pas de Face ID / Touch ID / code activé
+            // Ferme la vue
             fermerVueOuRetour()
         }
     }

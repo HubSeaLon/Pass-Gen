@@ -573,6 +573,9 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
     
     @IBAction func copierMdp(_ sender: UIButton) {
         guard let motDePasse = textMotdepasse.text, !motDePasse.isEmpty else { return }
+            if motDePasse == "Sélectionnez au moins une option !" || motDePasse == "Longueur trop courte pour inclure chaque type" {
+                return
+            }
             UIPasteboard.general.string = motDePasse
             afficherToast(message: "Mot de passe copié !")
     }
@@ -580,29 +583,41 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
     
     // appel à ChatGPT qui nous a généré un message pop up Toast
     func afficherToast(message: String, duree: Double = 2.0) {
+        // Dimension du toast
         let toastWidth: CGFloat = 200
         let toastHeight: CGFloat = 30
+        
+        // Position horizontale centrée
         let toastX = self.view.frame.size.width / 2 - toastWidth / 2
+        
+        // Position vertiale ajustée à 242 pixels du bas de l'écran
         let toastY = self.view.frame.size.height - 242
 
+        // Création d'un label pour le toast
         let toastLabel = UILabel(frame: CGRect(x: toastX, y: toastY, width: toastWidth, height: toastHeight))
-        toastLabel.backgroundColor = UIColor.black.withAlphaComponent(0.7)
-        toastLabel.textColor = UIColor.white
-        toastLabel.textAlignment = .center
-        toastLabel.font = UIFont.systemFont(ofSize: 14.0)
-        toastLabel.text = message
-        toastLabel.alpha = 0.0
-        toastLabel.layer.cornerRadius = 10
-        toastLabel.clipsToBounds = true
+        
+        
+        // Caractéristiques du label
+        toastLabel.backgroundColor = UIColor.black.withAlphaComponent(0.7) // couleur fond noir avec opacité de 0.7
+        toastLabel.textColor = UIColor.white  // Couleur texte blanc
+        toastLabel.textAlignment = .center // Centrage
+        toastLabel.font = UIFont.systemFont(ofSize: 14.0) // Taille police 14
+        toastLabel.text = message  // Texte affiché
+        toastLabel.alpha = 0.0  // Texte invisible au départ car animation ensuite
+        toastLabel.layer.cornerRadius = 10  // Bord arrondi
+        toastLabel.clipsToBounds = true  // S'assurer que le texte reste dans les bords
 
-        self.view.addSubview(toastLabel)
+        self.view.addSubview(toastLabel) // Ajouter au 1er plan le Toast
 
+            
         UIView.animate(withDuration: 0.5, animations: {
-            toastLabel.alpha = 1.0
+            toastLabel.alpha = 1.0   // animation qui fait apparaitre progressivement le Toast
         }) { _ in
+            // Temps de l'affichage du Toast (0.5 secondes)
             UIView.animate(withDuration: 0.5, delay: duree, options: .curveEaseOut, animations: {
                 toastLabel.alpha = 0.0
             }) { _ in
+                // Fais disparaitre le label une fois l'animation terminée
                 toastLabel.removeFromSuperview()
             }
         }
