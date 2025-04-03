@@ -644,6 +644,7 @@ Elias Baroudi et Hubert Geoffray Version 1.0 – 2025</string>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" image="plus" catalog="system"/>
                                 <connections>
+                                    <action selector="ajouter:" destination="1i3-oU-e6x" eventType="touchUpInside" id="Yo9-xS-Gbc"/>
                                     <segue destination="Yyw-SY-JM3" kind="show" id="Lpf-Q5-H9q"/>
                                 </connections>
                             </button>

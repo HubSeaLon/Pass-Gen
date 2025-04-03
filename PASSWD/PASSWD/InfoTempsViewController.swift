@@ -44,6 +44,8 @@ class InfoTempsViewController: UIViewController, UITableViewDataSource, UITableV
         return tableTemps.count
     }
     
+    
+    // Affichage des cellules
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? cellTemps else {
             return UITableViewCell()
@@ -60,8 +62,9 @@ class InfoTempsViewController: UIViewController, UITableViewDataSource, UITableV
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
+    
+        // Affichage et intereaction du TablView quand la vue est chargée (delegate pour sélection, scroll..)
+        // dataSource pour les données (cellules, contenu..)
         self.tableView.delegate = self
         self.tableView.dataSource = self
     }

@@ -10,6 +10,8 @@ import UIKit
 // Protocol permet de communiquer entre deux vues.
 // Ici nous voulons utiliser la fonction RafraichirMdp() après avoir rajouter des données à la BD
 
+
+// Protocol créé pour pouvoir utiliser la fonction RafraichirBase() dans la ue CoffreViewController
 protocol AjouterMDPDelegate: AnyObject {
     func didAjouterMDP()
 }
@@ -22,7 +24,7 @@ class AjouterMDPViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var login: UITextField!
     @IBOutlet weak var mdp: UITextField!
     
-    // Delegate
+    // Création Delegate
     weak var delegate: AjouterMDPDelegate?
     
     var annule = false
@@ -53,6 +55,7 @@ class AjouterMDPViewController: UIViewController, UITextFieldDelegate {
     }
     
     
+    // Cacher le clavier quand on tape autre part
     @objc func cacherClavier() {
         view.endEditing(true)
     }
@@ -65,12 +68,12 @@ class AjouterMDPViewController: UIViewController, UITextFieldDelegate {
         login.delegate = self
         mdp.delegate = self
         
+        // QUand on tape autre part pour cacher le clavier (GPT)
         let tap = UITapGestureRecognizer(target: self, action: #selector(cacherClavier))
         view.addGestureRecognizer(tap)
         
         enregistrer.isEnabled = false
         message.isHidden = true
-        
         
         // enlever l'autocorrection
         for champ in champTexte {
@@ -78,21 +81,6 @@ class AjouterMDPViewController: UIViewController, UITextFieldDelegate {
             champ.spellCheckingType = .no
         }
         
-    }
-    
-    
-    // MARK: - Navigation
-    
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-
-    
-    
-    // On transmet toutes les informations via segue.destination
-    
-    //var c: CoffreViewController!
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-       
     }
     
     
@@ -119,7 +107,7 @@ class AjouterMDPViewController: UIViewController, UITextFieldDelegate {
                 print("Données écrites avec succès dans : \(fileURL.path)")
                 print("Ajouté au fichier : \(texte)")
                 
-                // Appel du delegate
+                // Appel du delegate qui rafraichit l'affichage
                 delegate?.didAjouterMDP()
             } catch {
                 print("Erreur lors de l'écriture du fichier : \(error)")
@@ -138,6 +126,7 @@ class AjouterMDPViewController: UIViewController, UITextFieldDelegate {
             }
         }
         
+        // Ferme la vue actuelle
         self.dismiss(animated: true, completion: nil)
         
     }

@@ -20,6 +20,7 @@ class nCell: UITableViewCell {
     
 }
 
+// extension pour masquer les mots de passe (GPT)
 extension UILabel {
     func maskTextWithDots() {
         guard let originalText = self.text else { return }
@@ -39,7 +40,10 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
     
     @IBOutlet weak var message: UILabel!
     
-   
+    @IBAction func ajouter(_ sender: Any) {
+        deselectionnerLigne()
+    }
+    
     
     // Variables nécessaires à l'ajout de mdp
     var application: String = ""
@@ -146,13 +150,18 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
         
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        tabBarController?.tabBar.isHidden = true
+    }
     
     override func viewDidAppear(_ animated: Bool) {
             super.viewDidAppear(animated)
+        
         vue.isHidden = true
         supprimer.isHidden = true
         copier.isHidden = true
         annuler.isHidden = true
+        
         
         verifierBiometrie()
         
@@ -167,7 +176,6 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
         
         // Masquer la vue quand on la quitte
         vue.isHidden = true
-        
     }
 
     // Bar de recherche
@@ -182,7 +190,7 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     
-    // Logique de recherche
+    // Recherche dans la bar selon le nom d'app
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText.isEmpty {
             rechercheActive = false
@@ -199,10 +207,6 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.reloadData()
     }
 
-    
-    
-    
-    
     
     func deselectionnerLigne() {
         if let index = tableView.indexPathForSelectedRow {
@@ -228,11 +232,11 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
             return
         }
         
-        // 1. Supprimer la ligne du tableau
+        // Supprimer la ligne du tableau
         lines.remove(at: index)
         nbLignes = lines.count
 
-        // 2. Réécrire le fichier entier
+        // Réécrire le fichier entier
         if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
             let fileURL = documentsDirectory.appendingPathComponent("passwd.db")
             let nouveauContenu = lines.joined(separator: "\n") + "\n"
@@ -258,6 +262,8 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     
+    
+    // Copier le mot de passe
     @IBAction func boutonCopier(_ sender: UIButton) {
         guard let ligne = ligneSelectionnee else {
             return
@@ -272,7 +278,7 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
         deselectionnerLigne()
     }
     
-    
+    // Toast repris dans la vue GenerateurViewController
     func afficherToast(message: String, duree: Double = 2.0) {
         let toastLabel = UILabel(frame: CGRect(x: self.view.frame.size.width/2 - 150, y: self.view.frame.size.height - 150, width: 300, height: 30))
         toastLabel.backgroundColor = UIColor.black.withAlphaComponent(0.7)
@@ -296,13 +302,15 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
         }
     }
     
+    
+    
     @IBAction func boutonAnnuler(_ sender: UIButton) {
         deselectionnerLigne()
     }
     
     
     
-    
+    // Chargement des données
     func RafraichirBase() {
         if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
             let fileURL = documentsDirectory.appendingPathComponent("passwd.db")
@@ -339,24 +347,34 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
     }
 
     
+    /* Fonction pour vérifier la biométrie (FaceID, TouchID ou code de l'iPhone)
+     
+    Prérequis :
+    - Avoir un apple developer ID
+    - Dans le fichier Info.plist : ajouter "Privacy Face ID usage description et donner une description de l'utilisation du Face ID
+    - Sur un iPhone activer le mode développeur
+     */
     
     func verifierBiometrie() {
         let context = LAContext()
         var error: NSError?
 
-        // ✅ Autorise Face ID, Touch ID ou code de l'appareil
+
+        // Autorise Face ID, Touch ID ou code de l'appareil
         if context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) {
-            let raison = "Authentifiez-vous pour accéder à cette section."
+            let raison = "Authentifiez-vous pour accéder à votre coffre"
 
             context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: raison) { success, authError in
                 DispatchQueue.main.async {
                     if success {
-                        // Authentification réussie 🎉
+                        // Authentificatino réussie
                         self.vue.isHidden = false
+                        self.tabBarController?.tabBar.isHidden = false
                         self.RafraichirBase()
                     } else {
-                        // ❌ Échec ou annulation → retour
+                        // Échec ou annulation retour
                         self.vue.isHidden = true
+                        self.tabBarController?.tabBar.isHidden = false
                         self.fermerVueOuRetour()
                     }
                 }
@@ -368,19 +386,13 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
     }
 
     func fermerVueOuRetour() {
-        // Option 1 : revenir à un autre onglet
         if let tabBar = self.tabBarController {
             tabBar.selectedIndex = 0 // Revenir au 1er onglet
         }
-
-        // Option 2 : ou masquer le contenu / afficher un écran bloqué
-        // self.view.isHidden = true
     }
     
-    
-    
-    
-    // Delegate appelé quand un mot de passe est ajouté
+
+    // Delegate appelé quand un mot de passe est ajouté sur la vue AjoutMDPViewController et rafraichir l'affichage
     func didAjouterMDP() {
         RafraichirBase()
     }
@@ -389,7 +401,7 @@ class CoffreViewController: UIViewController, UITableViewDataSource, UITableView
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
         if let destination = segue.destination as? AjouterMDPViewController {
-            destination.delegate = self  // 👈 on devient le delegate
+            destination.delegate = self  // on devient le delegate
         }
     }
 

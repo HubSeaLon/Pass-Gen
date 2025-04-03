@@ -12,7 +12,6 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
     
     
     // Phonétique
-    
     @IBOutlet weak var textPhonetique: UITextField!
     
     let charPhonetique: [Character: [String]] = [
@@ -51,8 +50,10 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
         // Génération MDP
         var resultat = ""
         
+        // Gérer la casse
         let texte = sender.text?.lowercased() ?? ""
     
+        // On remplace aléatoirement chaque lettre de l'alphabet ou l'espace par un caractères du dictionnaire.
         for char in texte {
             if let lettre = charPhonetique[char] {
                 resultat += lettre.randomElement().map { String($0) } ?? "?"
@@ -140,15 +141,9 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
     
     // Complexité du mdp en nombre
     @IBOutlet weak var complexiteMdp: UILabel!
-    
-    
     @IBOutlet weak var barComplexite: UIProgressView!
-    
-    
     @IBOutlet weak var motComplexite: UILabel!
-    
     @IBOutlet weak var textMotdepasse: UITextView!
-    
     
     
     func initialisationVueMdp() {
@@ -161,7 +156,7 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
     
     // return pour retirer le clavier (GPT)
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder() // ⬅️ Ferme le clavier
+        textField.resignFirstResponder() // Ferme le clavier
         return true
     }
     
@@ -189,6 +184,7 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
 
         let pickers: [UIPickerView] = [pickerLongueur, pickerSeparateur, pickerEspacement]
         
+        // Activer l'interaction et l'affichage des picker
         for picker in pickers {
             picker.delegate = self
             picker.dataSource = self
@@ -462,7 +458,7 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
     L : longueur mot de passe (nombre de caractères)
     B : nombre de caractères différents qu'ils peuvent prendre
      
-    Cas ou on rajoute les séparateurs la formule deviendrait (Merci GPT):
+    Cas ou on rajoute les séparateurs la formule deviendrait (raisonement GPT):
      
     E = L * log2(B) + log2(k) + log2(C(L-1,k))
     ou k est nombre de séparateurs
@@ -582,7 +578,7 @@ class GenerationViewController: UIViewController, UIPickerViewDelegate, UIPicker
     }
     
     
-    // ChatGPT
+    // appel à ChatGPT qui nous a généré un message pop up Toast
     func afficherToast(message: String, duree: Double = 2.0) {
         let toastWidth: CGFloat = 200
         let toastHeight: CGFloat = 30
