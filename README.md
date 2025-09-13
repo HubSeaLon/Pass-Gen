@@ -10,7 +10,7 @@ L'utilisateur peut personnaliser son mot de passe **aléatoire** parmi :
 - majuscules
 - minuscules
 - chiffres
-- symboles
+- symboles (@, #, +, etc.)
 
 Il peut également générer un mot de passe **phonétique** en écrivant un mot ou une phrase. L'avantage du mot de passe phonétique est qu'il est plus simple à mémoriser qu'un mot de passe aléatoire. 
 
