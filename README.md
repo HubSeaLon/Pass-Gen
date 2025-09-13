@@ -16,7 +16,7 @@ Il peut également générer un mot de passe **phonétique** en écrivant un mot
 
 Pour chaque mot de passe créé, l'entropie (sécurité d'un mot de passe) est calculé et l'utilisateur peut tester sa vulnérabilité aux attaques par dictionnaires (rockyou) et le temps nécessaire à le cracker.
 
-Enfin, l'application offre coffre fort permettant de stocker et gérer des mots de passes accessible uniquement par le Face ID.
+Enfin, l'application offre un coffre fort permettant de stocker et gérer des mots de passes accessibles uniquement par le *Face ID*.
 
 Le rapport de ce projet de Master 1 Informatique est disponible ci-dessous et la vidéo de présentation : https://youtu.be/9DqNUZUatYU
 
