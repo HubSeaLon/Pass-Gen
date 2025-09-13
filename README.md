@@ -14,7 +14,7 @@ L'utilisateur peut personnaliser son mot de passe **aléatoire** parmi :
 
 Il peut également générer un mot de passe **phonétique** en écrivant un mot ou une phrase. L'avantage du mot de passe phonétique est qu'il est plus simple à mémoriser qu'un mot de passe aléatoire. 
 
-Pour chaque mot de passe créé, l'entropie (sécurité d'un mot de passe) est calculé et l'utilisateur peut tester la vulnérabilité d'un mot de passe aux attaques par dictionnaires (rockyou) et le temps nécessaire à le cracker.
+Pour chaque mot de passe créé, l'entropie (sécurité d'un mot de passe) est calculé et l'utilisateur peut tester sa vulnérabilité aux attaques par dictionnaires (rockyou) et le temps nécessaire à le cracker.
 
 Enfin, l'application offre coffre fort permettant de stocker et gérer des mots de passes accessible uniquement par le Face ID.
 
