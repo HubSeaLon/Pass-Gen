@@ -1,9 +1,9 @@
 # PASSWD 
 <img width="716" height="712" alt="logo" src="https://github.com/user-attachments/assets/85eebf9a-adcd-4721-9ed8-52b59d99769b" />
 
-*Passwd* est une application mobile IOS dévbeloppé en Swift (XCode) permettant de générer des mots de passes aléatoires. 
+*Passwd* est une application mobile IOS développée en Swift (XCode) permettant de générer des mots de passes. 
 
-L'utilisateur peut personnaliser son mot de passe parmi : 
+L'utilisateur peut personnaliser son mot de passe **aléatoire** parmi : 
 - la longueur
 - un séparateur (-, /, !, etc.)
 - l'espacement des séparateurs
